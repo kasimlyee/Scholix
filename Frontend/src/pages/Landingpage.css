@@ -1,0 +1,14 @@
+.landing-page .hero {
+  background-image: url("path-to-your-image.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.features .card {
+  border: none;
+  background-color: #f8f9fa;
+}
+
+footer {
+  border-top: 1px solid #e9ecef;
+}

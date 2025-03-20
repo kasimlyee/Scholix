@@ -1,0 +1,95 @@
+/* 🎨 Sidebar Container */
+.sidenav-container {
+  width: 250px;
+  height: 100vh;
+  color: #f0e80bf3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease-in-out;
+}
+
+/* 🎨 Logo & Branding */
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.logo-container h2 {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #f0f0f0;
+}
+
+/* 🎨 Sidebar Navigation */
+.sidenav {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* 🎨 Sidebar Buttons */
+.sidenav-link {
+  width: 100%;
+  padding: 12px 20px;
+  text-align: left;
+  color: #f0f0f0;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidenav-link:hover {
+  background: #2b1055;
+  color: #26c6da;
+}
+
+/* 🎨 Active Sidebar Item */
+.sidenav-link.active {
+  background: #1a0836;
+  color: #26c6da;
+  font-weight: bold;
+  border-left: 4px solid #26c6da;
+}
+
+/* 🎨 Sidebar Icons */
+.sidenav-icon {
+  font-size: 18px;
+}
+
+/* 🎨 Responsive Sidebar (Collapsible) */
+@media (max-width: 768px) {
+  .sidenav-container {
+    width: 70px;
+    align-items: flex-start;
+    padding-left: 5px;
+  }
+
+  .logo-container {
+    display: none;
+  }
+
+  .sidenav-link {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .sidenav-label {
+    display: none;
+  }
+}

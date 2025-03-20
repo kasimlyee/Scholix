@@ -1,0 +1,39 @@
+:root {
+  --primary-color: #003366; /* Dark Blue */
+  --secondary-color: #0055aa; /* Blue */
+  --highlight-color: #ffcc00; /* Yellow */
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #000000;
+}
+
+.container-custom {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+}
+.btn-warning {
+  background-color: var(--highlight-color);
+  color: black;
+}
+.btn-danger {
+  background-color: #d9534f;
+}
+
+.table-custom {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+th {
+  background-color: var(--primary-color);
+  color: white;
+}
