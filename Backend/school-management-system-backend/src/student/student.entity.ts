@@ -1,19 +1,11 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
-import { Class } from './classes/class.entity';
-import { Attendance } from 'src/attendance/attendance.entity';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'student' })
+@Entity()
 export class Student {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ unique: true })
+  @Column()
   idNumber: string;
 
   @Column()
@@ -26,9 +18,6 @@ export class Student {
   age: number;
 
   @Column()
-  email: string;
-
-  @Column()
   phoneNumber: string;
 
   @Column()
@@ -38,11 +27,52 @@ export class Student {
   parentName: string;
 
   @Column()
-  parentPhoneNumner: string;
+  parentPhoneNumber: string;
 
   @Column()
-  parentEmail: string;
+  admissionDate: string;
 
-  @Column()
-  address: string;
+  @Column('json', { default: [] })
+  medicalHistory: MedicalRecord[];
+
+  @Column('json', { default: [] })
+  academicHistory: AcademicRecord[];
+
+  @Column('json', { default: [] })
+  attendance: AttendanceRecord[];
+
+  @Column('json', { default: [] })
+  incidents: Incident[];
+
+  @Column({ default: 0 })
+  points: number;
+}
+
+export interface MedicalRecord {
+  id: string;
+  condition: string;
+  date: string;
+  notes: string;
+  emergencyLevel: 'low' | 'medium' | 'high';
+}
+
+export interface AcademicRecord {
+  subject: string;
+  grade: number;
+  semester: string;
+  year: number;
+}
+
+export interface AttendanceRecord {
+  date: string;
+  status: 'present' | 'absent' | 'late';
+}
+
+export interface Incident {
+  id: string;
+  type: 'behavioral' | 'academic' | 'safety';
+  description: string;
+  severity: 'low' | 'medium' | 'high';
+  date: string;
+  status: 'pending' | 'resolved' | 'in-progress';
 }

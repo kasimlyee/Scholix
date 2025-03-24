@@ -1,43 +1,70 @@
-import { MDBCard, MDBCardBody } from "mdb-react-ui-kit";
+import { MDBCard, MDBCardBody, MDBProgress } from "mdb-react-ui-kit";
+import { 
+  FaUserGraduate, 
+  FaChalkboardTeacher, 
+  FaCalendarAlt,
+  FaNewspaper,
+  FaChartLine
+} from "react-icons/fa";
+import { Metrics } from "../types/Metrics";
 import "./Overview.css";
 
-const Overview = () => {
-  return (
-    <div className="overview-container">
-      <MDBCard className="overview-card">
-        <MDBCardBody className="overview-content">
-          <h5 className="overview-title">Total Students Enrolled</h5>
-          <h3 className="overview-stat">
-            <i className="fa-solid fa-user-graduate overview-icon"></i> 1,234
-          </h3>
-        </MDBCardBody>
-      </MDBCard>
-      <MDBCard className="overview-card">
-        <MDBCardBody className="overview-content">
-          <h5 className="overview-title">Total Teachers</h5>
-          <h3 className="overview-stat">
-            <i className="fa-solid fa-person-chalkboard overview-icon"></i> 56
-          </h3>
-        </MDBCardBody>
-      </MDBCard>
-      <MDBCard className="overview-card">
-        <MDBCardBody className="overview-content">
-          <h5 className="overview-title">Upcoming Events</h5>
-          <h3 className="overview-stat">
-            <i className="fa-solid fa-calendar-days overview-icon"></i> 3
-          </h3>
-        </MDBCardBody>
-      </MDBCard>
-      <MDBCard className="overview-card">
-        <MDBCardBody className="overview-content">
-          <h5 className="overview-title">Recent News</h5>
-          <h3 className="overview-stat">
-            <i className="fa-solid fa-newspaper overview-icon"></i> 5
-          </h3>
-        </MDBCardBody>
-      </MDBCard>
-    </div>
-  );
+interface OverviewProps {
+  metrics: Metrics[];
+}
+
+const getIcon = (title: string) => {
+  switch(title.toLowerCase()) {
+    case 'students': return <FaUserGraduate className="metric-icon" />;
+    case 'teachers': return <FaChalkboardTeacher className="metric-icon" />;
+    case 'events': return <FaCalendarAlt className="metric-icon" />;
+    case 'news': return <FaNewspaper className="metric-icon" />;
+    default: return <FaChartLine className="metric-icon" />;
+  }
 };
 
-export default Overview;
+const getProgressColor = (change: string) => {
+  const value = parseFloat(change);
+  if (value > 0) return 'success';
+  if (value < 0) return 'danger';
+  return 'info';
+};
+
+export default function Overview({ metrics }: OverviewProps) {
+  return (
+    <div className="overview-grid">
+      {metrics.map((metric, index) => (
+        <MDBCard 
+          key={index}
+          className="metric-card hover-shadow"
+          data-aos="fade-up"
+          data-aos-delay={index * 100}
+        >
+          <MDBCardBody className="metric-content">
+            <div className="metric-header">
+              <div className="metric-icon-container">
+                {getIcon(metric.title)}
+              </div>
+              <span className="metric-title">{metric.title}</span>
+            </div>
+            
+            <div className="metric-value-container">
+              <h3 className="metric-value">{metric.value}</h3>
+              <span className={`metric-change ${getProgressColor(metric.change)}`}>
+                {metric.change}
+              </span>
+            </div>
+
+            <MDBProgress
+              height="4px"
+              className="metric-progress"
+              material
+              color={getProgressColor(metric.change)}
+              value={Math.abs(parseFloat(metric.change))}
+            />
+          </MDBCardBody>
+        </MDBCard>
+      ))}
+    </div>
+  );
+}

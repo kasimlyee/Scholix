@@ -1,126 +1,81 @@
-import { useState } from "react";
-import { FaSchool, FaEnvelope, FaLock, FaUserTag } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
+import axios from "axios";
 
-interface SignupProps {
-  onSignup: (email: string, password: string, role: string) => void;
+// Define SignUpProps (move to a shared types file if reused)
+interface SignUpProps {
+  availableRoles?: string[]; // Optional prop
 }
 
-interface Errors {
-  email?: JSX.Element;
-  password?: JSX.Element;
-  role?: JSX.Element;
-}
+const SignUp: React.FC<SignUpProps> = ({
+  availableRoles: initialRoles = [],
+}) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
+  const [availableRoles, setAvailableRoles] = useState(initialRoles);
+  const { user } = useAuth();
 
-const SignUp: React.FC<SignupProps> = ({ onSignup }) => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [role, setRole] = useState<string>("");
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/auth/available-roles`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        setAvailableRoles(response.data);
+      } catch (error) {
+        console.error("Failed to fetch available roles");
+      }
+    };
+    if (user.token) fetchRoles();
+  }, [user.token]);
 
-  const [errors, setErrors] = useState<Errors>({});
-
-  const validate = () => {
-    const newErrors: Errors = {};
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = (
-        <div className="alert alert-warning">
-          Please enter a valid email address.
-        </div>
-      );
-    }
-
-    if (
-      !password ||
-      !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        password
-      )
-    ) {
-      newErrors.password = (
-        <div className="alert alert-warning">
-          Password muct be at least 8 characters long, containing a letter, a
-          number and a special character.
-        </div>
-      );
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handeSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      onSignup(email, password, role);
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/register`,
+        { email, password, role },
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      setAvailableRoles(availableRoles.filter((r) => r !== role));
+      // Optionally redirect or show success message
+    } catch (error) {
+      console.error("Signup failed");
     }
   };
 
   return (
     <div>
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <div className="card shadow p-4" style={{ width: "25rem" }}>
-          <div className="text-center">
-            <FaSchool size={50} className="text-primary mb-3" />
-            <h4>School Management System</h4>
-            <p className="text-muted">Create an Account</p>
-          </div>
-          <form onSubmit={handeSubmit}>
-            {/**Email */}
-            <div className="mb-3 input-group">
-              <span className="input-group-text">
-                <FaEnvelope />
-              </span>
-              <input
-                type="email"
-                className={`form-control ${errors.email ? "is-invalid" : ""}`}
-                placeholder="Enter your Email..."
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              {errors.email && <div>{errors.email}</div>}
-            </div>
-
-            {/**Password */}
-            <div className="mb-3 input-group">
-              <span className="input-group-text">
-                <FaLock />
-              </span>
-              <input
-                type="password"
-                className={`form-control ${
-                  errors.password ? "is-invalid" : ""
-                }`}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              {errors.password && <div>{errors.password}</div>}
-            </div>
-
-            {/**Role Dropdown */}
-            <div className="mb-3 input-group">
-              <span className="input-group-text">
-                <FaUserTag />
-              </span>
-              <select
-                className="form-control"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                required
-              >
-                <option value="admin">Administrator</option>
-                <option value="Librarian">Librarian</option>
-                <option value="Bursar">Bursar</option>
-                <option value="DOS">DOS</option>
-                <option value="Staff">Staff</option>
-              </select>
-            </div>
-
-            <button type="submit" className="btn btn-primary w-100">
-              Sign up
-            </button>
-          </form>
-        </div>
-      </div>
+      <h1>Sign Up New User</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          required
+        />
+        <select value={role} onChange={(e) => setRole(e.target.value)} required>
+          <option value="">Select Role</option>
+          {availableRoles.map((r) => (
+            <option key={r} value={r}>
+              {r}
+            </option>
+          ))}
+        </select>
+        <button type="submit">Sign Up</button>
+      </form>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Attendance } from 'src/attendance/attendance.entity';
+
 
 @Entity('devices')
 export class Device {

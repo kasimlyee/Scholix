@@ -41,7 +41,7 @@ const UploadStudents = () => {
     try {
       setLoading(true);
       const response = await axios.get<Student[]>(
-        `http://localhost:3000/api/students/class/:${selectedClass}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/students/class/:${selectedClass}`
       );
       setStudents(response.data);
       setMessage("");
@@ -70,7 +70,7 @@ const UploadStudents = () => {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:3000/api/students/upload", formData, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/students/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage("✅ File uploaded successfully!");
@@ -91,7 +91,7 @@ const UploadStudents = () => {
   const handleCard = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/device/card?ip=http://localhost:8843&username=Kasim&password=@Kas!m1223`
+        `${import.meta.env.VITE_BACKEND_URL}/api/device/card?ip=http://localhost:8843&username=Kasim&password=@Kas!m1223`
       );
       const data = await response.json();
       return data;

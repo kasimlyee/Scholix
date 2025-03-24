@@ -1,4 +1,4 @@
-import { Attendance } from 'src/attendance/attendance.entity';
+
 import { Entity, Column, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

@@ -4,7 +4,12 @@ import md5 from "md5";
 
 import "./TopBar.css";
 
-function TopBar() {
+interface TopBarProps {
+  onNotificationClick: () => void;
+  onQuickActionsClick: () => void;
+}
+
+export default function TopBar({ onNotificationClick, onQuickActionsClick }: TopBarProps) {
   const navigate = useNavigate();
   const [user, setUser] = useState({ email: "", name: "", profilePic: "" });
 
@@ -33,7 +38,10 @@ function TopBar() {
       <div className="top-bar-left">
         <h2>School Management System</h2>
       </div>
-
+      <div className="top-bar">
+      <button onClick={onNotificationClick}>Notifications</button>
+      <button onClick={onQuickActionsClick}>Quick Actions</button>
+    </div>
       <div className="top-bar-center">
         <input type="text" placeholder="Search..." className="search-input" />
         <button className="search-btn">
@@ -71,4 +79,3 @@ function TopBar() {
   );
 }
 
-export default TopBar;

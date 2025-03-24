@@ -1,39 +1,164 @@
 :root {
-  --primary-color: #003366; /* Dark Blue */
-  --secondary-color: #0055aa; /* Blue */
-  --highlight-color: #ffcc00; /* Yellow */
+  --dark-blue: #1a2b4c;
+  --blue: #2e5cb8;
+  --yellow: #ffcc00;
+  --light-bg: #f8f9fa;
+  --dark-bg: #1e2a38;
+  --light-text: #333;
+  --dark-text: #e0e0e0;
+  --card-bg-light: #ffffff;
+  --card-bg-dark: #2c3e50;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+    --primary-gradient: linear-gradient(90deg, #2e5cb8, #1a2b4c);
+  --input-bg: #f1f3f5;
+  --input-bg-dark: #2c3e50;
 }
 
 body {
-  font-family: "Arial", sans-serif;
-  background-color: #000000;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  font-family: 'Arial', sans-serif;
 }
 
-.container-custom {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+[data-theme="light"] {
+  --bg-color: var(--light-bg);
+  --text-color: var(--light-text);
+  --card-bg: var(--card-bg-light);
+}
+
+[data-theme="dark"] {
+  --bg-color: var(--dark-bg);
+  --text-color: var(--dark-text);
+  --card-bg: var(--card-bg-dark);
+}
+
+.card-custom {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.table-custom thead {
+  background-color: var(--dark-blue);
+  color: white;
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
-  border: none;
-}
-.btn-warning {
-  background-color: var(--highlight-color);
-  color: black;
-}
-.btn-danger {
-  background-color: #d9534f;
+  background-color: var(--blue);
+  border-color: var(--blue);
+  transition: all 0.3s ease;
 }
 
-.table-custom {
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
+.btn-primary:hover {
+  background-color: var(--dark-blue);
+  border-color: var(--dark-blue);
 }
-th {
-  background-color: var(--primary-color);
+
+.btn-warning {
+  background-color: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--dark-blue);
+  transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+  background-color: #e6b800;
+  border-color: #e6b800;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 12px;
+}
+
+.collapsible-header {
+  cursor: pointer;
+  padding: 10px;
+  background-color: var(--dark-blue);
   color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.collapsible-content {
+  padding: 15px;
+}
+
+@media (max-width: 768px) {
+  .card-custom {
+    padding: 1rem;
+  }
+  
+  .table-custom {
+    font-size: 0.9rem;
+  }
+  
+  .modal-90w {
+    width: 95%;
+    max-width: none;
+  }
+}
+
+.high-contrast [data-theme="light"] {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --card-bg: #ffffff;
+}
+
+.high-contrast [data-theme="dark"] {
+  --bg-color: #000000;
+  --text-color: #ffffff;
+  --card-bg: #333333;
+}
+
+
+.signup-container, .login-container {
+  background: var(--bg-color);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-signup, .card-login {
+  background: var(--card-bg);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(46, 92, 184, 0.25);
+}
+
+.btn-signup, .btn-login {
+  background: var(--primary-gradient);
+  border: none;
+  padding: 0.75rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-signup:hover, .btn-login:hover {
+  background: var(--dark-blue);
+}
+
+.verification-modal .modal-content {
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+@media (max-width: 576px) {
+  .card-signup, .card-login {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
 }

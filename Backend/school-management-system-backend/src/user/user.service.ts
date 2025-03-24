@@ -7,10 +7,10 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
-  //creating user
   async createUser(
     email: string,
     password: string,
@@ -21,17 +21,26 @@ export class UserService {
       email,
       password: hashedPassword,
       role,
+      isVerified: false,
+      isLoggedIn: false,
     });
     return this.userRepository.save(user);
   }
 
-  //finding user by email
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { email } });
+    return this.userRepository.findOneBy({ email });
   }
 
-  //update user
-  async updateUser(user: User) {
+  async findByRole(role: UserRole): Promise<User | null> {
+    return this.userRepository.findOneBy({ role });
+  }
+
+  async updateUser(user: User): Promise<User> {
     return this.userRepository.save(user);
+  }
+
+  // Expose repository for convenience in AuthService
+  get repository(): Repository<User> {
+    return this.userRepository;
   }
 }

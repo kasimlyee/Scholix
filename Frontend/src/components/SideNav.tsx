@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./sidenav.css";
 import logo from "../assets/images/logo1.png";
@@ -8,13 +9,17 @@ interface NavLink {
   icon: string;
 }
 
-export function SideNav() {
+interface SideNavProps {
+  activeView: string;
+  setActiveView: (view: string) => void;
+}
+
+export default function SideNav({ activeView, setActiveView }: SideNavProps) {
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navLinks: NavLink[] = [
     { label: "Dashboard", path: "/dashboard", icon: "fas fa-tachometer-alt" },
-
-    // 📌 STUDENT MANAGEMENT
     { label: "Students", path: "/students", icon: "fa-solid fa-user-graduate" },
     { label: "Admissions", path: "/admissions", icon: "fa-solid fa-user-plus" },
     {
@@ -22,8 +27,6 @@ export function SideNav() {
       path: "/classes",
       icon: "fa-solid fa-school",
     },
-
-    // 📌 TEACHER MANAGEMENT
     {
       label: "Teachers",
       path: "/teachers",
@@ -35,8 +38,6 @@ export function SideNav() {
       path: "/timetable",
       icon: "fa-solid fa-calendar-alt",
     },
-
-    // 📌 ATTENDANCE & EXAMS
     { label: "Attendance", path: "/attendance", icon: "fas fa-check-circle" },
     { label: "Exams", path: "/exams", icon: "fa-solid fa-pen-ruler" },
     {
@@ -44,8 +45,6 @@ export function SideNav() {
       path: "/grades",
       icon: "fa-solid fa-graduation-cap",
     },
-
-    // 📌 FEES & FINANCIAL MANAGEMENT
     {
       label: "Fees Management",
       path: "/fees",
@@ -56,21 +55,13 @@ export function SideNav() {
       path: "/payroll",
       icon: "fa-solid fa-file-invoice-dollar",
     },
-
-    // 📌 LIBRARY MANAGEMENT
     { label: "Library", path: "/library", icon: "fa-solid fa-book" },
     { label: "E-Resources", path: "/resources", icon: "fa-solid fa-laptop" },
-
-    // 📌 HOSTEL & TRANSPORT
     { label: "Hostel Management", path: "/hostel", icon: "fa-solid fa-bed" },
     { label: "Transport", path: "/transport", icon: "fa-solid fa-bus" },
-
-    // 📌 COMMUNICATION
     { label: "Notices", path: "/notices", icon: "fa-solid fa-bell" },
     { label: "Messages", path: "/messages", icon: "fa-solid fa-envelope" },
     { label: "Parents", path: "/parents", icon: "fa-solid fa-user-friends" },
-
-    // 📌 SETTINGS & LOGOUT
     { label: "Settings", path: "/settings", icon: "fa-solid fa-cogs" },
     {
       label: "Logout",
@@ -79,25 +70,40 @@ export function SideNav() {
     },
   ];
 
-  const handleNavigation = (path: string) => {
+  const handleNavigation = (path: string, label: string) => {
+    setActiveView(label);
     navigate(path);
   };
 
   return (
-    <aside className="sidenav-container">
+    <aside className={`sidenav-container ${isCollapsed ? "collapsed" : ""}`}>
       <div className="logo-container">
         <img src={logo} alt="Logo" className="logo" />
-        <h2>Naalya SS Lugazi</h2>
+        {!isCollapsed && <h2>Naalya SS Lugazi</h2>}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="toggle-btn"
+        >
+          {isCollapsed ? (
+            <i className="fas fa-angle-right"></i>
+          ) : (
+            <i className="fas fa-angle-left"></i>
+          )}
+        </button>
       </div>
       <nav className="sidenav">
         {navLinks.map((link) => (
           <button
             key={link.path}
-            onClick={() => handleNavigation(link.path)}
-            className="sidenav-link"
+            onClick={() => handleNavigation(link.path, link.label)}
+            className={`sidenav-link ${
+              activeView === link.label ? "active" : ""
+            }`}
           >
             <i className={`${link.icon} sidenav-icon`}></i>
-            <span className="sidenav-label">{link.label}</span>
+            {!isCollapsed && (
+              <span className="sidenav-label">{link.label}</span>
+            )}
           </button>
         ))}
       </nav>

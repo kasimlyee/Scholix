@@ -1,127 +1,111 @@
-import "./signin.css";
-import {
-  MDBContainer,
-  MDBCol,
-  MDBRow,
-  MDBBtn,
-  MDBIcon,
-  MDBInput,
-  MDBCheckbox,
-} from "mdb-react-ui-kit";
+import { useState } from "react";
+import { FaSchool, FaEnvelope, FaLock, FaSpinner } from "react-icons/fa";
+import { Form, Button, Alert, InputGroup } from "react-bootstrap";
+import { useAuth } from "../hooks/useAuth";
+import "../theme.css";
 
-function SignIn() {
-  return (
-    <MDBContainer fluid className="p-3 my-5 h-custom">
-      <MDBRow>
-        <MDBCol col="10" md="6">
-          <img src="images/logo.jpg" className="img-fluid" alt="Logo" />
-        </MDBCol>
-
-        <MDBCol col="4" md="6">
-          <div className="d-flex flex-row align-items-center justify-content-center">
-            <p className="lead fw-normal mb-0 me-3">Sign in with</p>
-
-            <MDBBtn floating size="sm" tag="a" className="me-2">
-              <MDBIcon fab icon="facebook-f" />
-            </MDBBtn>
-
-            <MDBBtn floating size="sm" tag="a" className="me-2">
-              <MDBIcon fab icon="twitter" />
-            </MDBBtn>
-
-            <MDBBtn floating size="sm" tag="a" className="me-2">
-              <MDBIcon fab icon="linkedin-in" />
-            </MDBBtn>
-          </div>
-
-          <div className="divider d-flex align-items-center my-4">
-            <p className="text-center fw-bold mx-3 mb-0">Or</p>
-          </div>
-
-          <MDBInput
-            wrapperClass="mb-4"
-            label="Email address"
-            id="formControlLg"
-            type="email"
-            size="lg"
-          />
-          <MDBInput
-            wrapperClass="mb-4"
-            label="Password"
-            id="formControlLg"
-            type="password"
-            size="lg"
-          />
-
-          <div className="d-flex justify-content-between mb-4">
-            <MDBCheckbox
-              name="flexCheck"
-              value=""
-              id="flexCheckDefault"
-              label="Remember me"
-            />
-            <a href="!#">Forgot password?</a>
-          </div>
-
-          <div className="text-center text-md-start mt-4 pt-2">
-            <MDBBtn className="mb-0 px-5" size="lg">
-              Login
-            </MDBBtn>
-            <p className="small fw-bold mt-2 pt-1 mb-2">
-              Don't have an account?{" "}
-              <a href="#!" className="link-danger">
-                Register
-              </a>
-            </p>
-          </div>
-        </MDBCol>
-      </MDBRow>
-
-      <div className="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
-        <div className="text-white mb-3 mb-md-0">
-          Copyright © 2024. All rights reserved.
-        </div>
-
-        <div>
-          <MDBBtn
-            tag="a"
-            color="none"
-            className="mx-3"
-            style={{ color: "white" }}
-          >
-            <MDBIcon fab icon="facebook-f" size="sm" />
-          </MDBBtn>
-
-          <MDBBtn
-            tag="a"
-            color="none"
-            className="mx-3"
-            style={{ color: "white" }}
-          >
-            <MDBIcon fab icon="twitter" size="sm" />
-          </MDBBtn>
-
-          <MDBBtn
-            tag="a"
-            color="none"
-            className="mx-3"
-            style={{ color: "white" }}
-          >
-            <MDBIcon fab icon="google" size="sm" />
-          </MDBBtn>
-
-          <MDBBtn
-            tag="a"
-            color="none"
-            className="mx-3"
-            style={{ color: "white" }}
-          >
-            <MDBIcon fab icon="linkedin-in" size="sm" />
-          </MDBBtn>
-        </div>
-      </div>
-    </MDBContainer>
-  );
+interface Errors {
+  email?: string;
+  password?: string;
 }
 
-export default SignIn;
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errors, setErrors] = useState<Errors>({});
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string>("");
+  const { login } = useAuth();
+
+  const validate = () => {
+    const newErrors: Errors = {};
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    if (!password) {
+      newErrors.password = "Password is required.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validate()) {
+      setLoading(true);
+      try {
+        await login(email, password);
+        setMessage("Login successful!");
+      } catch (error) {
+        setMessage("Login failed. Check your credentials.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Rest of the component remains the same
+  return (
+    <div className="login-container">
+      <div className="card-login">
+        <div className="text-center mb-4">
+          <FaSchool size={50} className="text-primary mb-3" />
+          <h4>School Management System</h4>
+          <p className="text-muted">Sign In</p>
+        </div>
+        <Form onSubmit={handleSubmit}>
+          {/* Form fields unchanged */}
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <FaEnvelope />
+            </InputGroup.Text>
+            <Form.Control
+              type="email"
+              placeholder="Enter your email..."
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              isInvalid={!!errors.email}
+              required
+              aria-label="Email"
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.email}
+            </Form.Control.Feedback>
+          </InputGroup>
+
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <FaLock />
+            </InputGroup.Text>
+            <Form.Control
+              type="password"
+              placeholder="Enter your password..."
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              isInvalid={!!errors.password}
+              required
+              aria-label="Password"
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.password}
+            </Form.Control.Feedback>
+          </InputGroup>
+
+          <Button type="submit" className="btn-login w-100" disabled={loading}>
+            {loading ? <FaSpinner className="spinner" /> : "Sign In"}
+          </Button>
+          {message && (
+            <Alert
+              variant={message.includes("failed") ? "danger" : "success"}
+              className="mt-3"
+            >
+              {message}
+            </Alert>
+          )}
+        </Form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

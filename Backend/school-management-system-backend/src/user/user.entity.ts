@@ -1,11 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-export type UserRole = 'admin' | 'Librarian' | 'DOS' | 'Bursar' | 'Staff';
+export type UserRole = 'Admin' | 'Librarian' | 'Bursar' | 'DOS' | 'Staff';
+
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ unique: true })
   email: string;
@@ -13,19 +13,18 @@ export class User {
   @Column()
   password: string;
 
+  @Column({
+    type: 'enum',
+    enum: ['Admin', 'Librarian', 'Bursar', 'DOS', 'Staff'],
+  })
+  role: UserRole;
+
   @Column({ default: false })
   isVerified: boolean;
 
   @Column({ nullable: true })
-  otpCode: string;
+  verificationCode: string;
 
-  @Column({
-    type: 'enum',
-    enum: ['admin', 'Librarian', 'DOS', 'Bursar', 'Staff'],
-    default: 'Staff',
-  })
-  role: UserRole;
-
-  @Column({ nullable: true })
-  otpExpires: Date;
+  @Column({ default: false })
+  isLoggedIn: boolean;
 }

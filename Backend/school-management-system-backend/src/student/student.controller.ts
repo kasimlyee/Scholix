@@ -2,115 +2,130 @@ import {
   Controller,
   Get,
   Post,
-  Put,
+  Patch,
   Delete,
-  Body,
   Param,
-  UseInterceptors,
+  Body,
   UploadedFile,
+  UseInterceptors,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { StudentService } from './student.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { excelFileUploadOptions } from './config/upload.config';
+import { StudentService } from './student.service';
+import { CreateAcademicRecordDto } from './dto/create-academic-record.dto';
+import { CreateStudentDto } from './dto/student.dto';
+import { UpdateIncidentDto } from './dto/incidental.dto';
+import { CreateIncidentDto } from './dto/create-incidental.dto';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { CreateMedicalRecordDto } from './dto/create-modal-record.dto';
 
-@Controller('api/students')
+@Controller('students')
 export class StudentController {
-  constructor(private readonly studentService: StudentService) {}
+  constructor(private readonly studentsService: StudentService) {}
 
-  //Create a new student
   @Post()
-  async createStudent(
-    @Body()
-    body: {
-      idNumber: string;
-      firstName: string;
-      lastName: string;
-      age: number;
-      email: string;
-      phoneNumber: string;
-      enrolledClass: string;
-      parentName: string;
-      parentPhoneNumner: string;
-      parentEmail: string;
-      address: string;
-    },
-  ) {
-    return this.studentService.createStudent(
-      body.idNumber,
-      body.firstName,
-      body.lastName,
-      body.age,
-      body.email,
-      body.phoneNumber,
-      body.enrolledClass,
-      body.parentName,
-      body.parentPhoneNumner,
-      body.parentEmail,
-      body.address,
-    );
+  create(@Body() createStudentDto: CreateStudentDto) {
+    return this.studentsService.create(createStudentDto);
   }
 
-  //get all students
-  @Get()
-  async getAllStudents() {
-    return this.studentService.getAllStudents();
+  @Get('class/:className')
+  findByClass(@Param('className') className: string) {
+    return this.studentsService.findByClass(className);
   }
 
-  //get student by id
-  @Get(':idNumber')
-  async getStudentById(@Param('idNumber') idNumber: string) {
-    return this.studentService.getStudentById(idNumber);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.studentsService.findOne(id);
   }
 
-  //get Students by class
-  @Get('class/:enrolledClass')
-  async getStudentsByClass(@Param('enrolledClass') enrolledClass: string) {
-    return this.studentService.getStudentsByClass(enrolledClass);
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.studentsService.delete(id);
   }
 
-  //update student details
-  @Put(':idNumber')
-  async updateStudent(
-    @Param('idNumber') idNumber: string,
-    @Body()
-    body: {
-      firstName?: string;
-      lastName?: string;
-      age?: number;
-      email?: string;
-      phoneNumber?: string;
-      enrolledClass?: string;
-      parentName?: string;
-      parentPhoneNumner?: string;
-      parentEmail?: string;
-      address?: string;
-    },
-  ) {
-    return this.studentService.updateStudent(
-      idNumber,
-      body.firstName,
-      body.lastName,
-      body.age,
-      body.email,
-      body.phoneNumber,
-      body.enrolledClass,
-      body.parentName,
-      body.parentPhoneNumner,
-      body.parentEmail,
-      body.address,
-    );
-  }
-
-  //delelte student
-  //@Delete(':id')
-  //async deleteStudent(@Param('id') id:number){
-  //return this.studentService.deleteStudent(id)
-  //}
-
-  //uploading students
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', excelFileUploadOptions))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.studentService.uploadStudentsFromFile(file);
+  @UseInterceptors(FileInterceptor('file'))
+  uploadStudents(@UploadedFile() file: Express.Multer.File) {
+    return this.studentsService.uploadStudents(file);
+  }
+
+  @Patch(':id/points')
+  updatePoints(
+    @Param('id') id: string,
+    @Body() body: { points: number; reason: string },
+  ) {
+    return this.studentsService.updatePoints(id, body.points, body.reason);
+  }
+
+  @Post(':id/incidents')
+  addIncident(@Param('id') id: string, @Body() incidentDto: CreateIncidentDto) {
+    return this.studentsService.addIncident(id, incidentDto);
+  }
+
+  @Patch(':id/incidents/:incidentId')
+  updateIncidentStatus(
+    @Param('id') id: string,
+    @Param('incidentId') incidentId: string,
+    @Body() updateDto: UpdateIncidentDto,
+  ) {
+    return this.studentsService.updateIncidentStatus(id, incidentId, updateDto);
+  }
+
+  @Post(':id/notify')
+  notifyParent(@Param('id') id: string, @Body() body: { incidentId: string }) {
+    return this.studentsService.notifyParent(id, body.incidentId);
+  }
+
+  @Post('bulk-notify')
+  bulkNotify(@Body() body: { studentIds: string[] }) {
+    return this.studentsService.bulkNotify(body.studentIds);
+  }
+
+  @Post(':id/attendance')
+  addAttendance(
+    @Param('id') id: string,
+    @Body() attendanceDto: CreateAttendanceDto,
+  ) {
+    return this.studentsService.addAttendance(id, attendanceDto);
+  }
+
+  @Post(':id/academic')
+  addAcademicRecord(
+    @Param('id') id: string,
+    @Body() academicDto: CreateAcademicRecordDto,
+  ) {
+    return this.studentsService.addAcademicRecord(id, academicDto);
+  }
+
+  @Post(':id/medical')
+  addMedicalRecord(
+    @Param('id') id: string,
+    @Body() medicalDto: CreateMedicalRecordDto,
+  ) {
+    return this.studentsService.addMedicalRecord(id, medicalDto);
+  }
+
+  @Get(':id/attendance-report')
+  getAttendanceReport(
+    @Param('id') id: string,
+    @Query('period') period: 'daily' | 'weekly' | 'monthly' = 'monthly',
+  ) {
+    return this.studentsService.getAttendanceReport(id, period);
+  }
+
+  @Get(':id/subject-analysis')
+  getSubjectStrengthWeakness(@Param('id') id: string) {
+    return this.studentsService.getSubjectStrengthWeakness(id);
+  }
+
+  @Get(':id/behavior-trends')
+  getBehaviorTrends(@Param('id') id: string) {
+    return this.studentsService.getBehaviorTrends(id);
+  }
+
+  @Get('class-stats/:className')
+  getClassStats(@Param('className') className: string) {
+    return this.studentsService.getClassStats(className);
   }
 }

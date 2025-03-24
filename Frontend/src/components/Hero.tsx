@@ -6,7 +6,7 @@ function Hero() {
 
   const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault(); // Prevents the page from reloading
-    navigate("/signup"); // Navigate programmatically
+    navigate("/create"); // Navigate programmatically
   };
 
   return (

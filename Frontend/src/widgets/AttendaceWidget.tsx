@@ -1,5 +1,5 @@
 // AttendanceWidget.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, Row, Col, ProgressBar, Spinner } from "react-bootstrap";
 import { Line } from "react-chartjs-2";
 import {
@@ -24,14 +24,18 @@ ChartJS.register(
   PointElement
 );
 
-interface AttendanceData {
+interface DailyAttendance {
   date: string;
   present: number;
   absent: number;
 }
 
-const AttendanceWidget: React.FC = () => {
-  const [attendanceData, setAttendanceData] = useState<AttendanceData[]>([]);
+interface AttendanceWidgetProps {
+  onViewDetails: () => void;
+}
+
+export default function AttendanceWidget({ onViewDetails }: AttendanceWidgetProps) {
+  const [attendanceData, setAttendanceData] = useState<DailyAttendance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalPresent, setTotalPresent] = useState<number>(0);
   const [totalAbsent, setTotalAbsent] = useState<number>(0);
@@ -39,92 +43,119 @@ const AttendanceWidget: React.FC = () => {
   useEffect(() => {
     // Simulate fetching attendance data from an API or database
     setTimeout(() => {
-      const data = [
+      const mockData: DailyAttendance[] = [
         { date: "2025-02-01", present: 40, absent: 5 },
         { date: "2025-02-02", present: 42, absent: 3 },
         { date: "2025-02-03", present: 39, absent: 6 },
         { date: "2025-02-04", present: 45, absent: 0 },
         { date: "2025-02-05", present: 38, absent: 7 },
       ];
-      setAttendanceData(data);
+      setAttendanceData(mockData);
       setLoading(false);
 
-      // Calculate total present/absent for the progress bars
-      const totalPresentCount = data.reduce((acc, cur) => acc + cur.present, 0);
-      const totalAbsentCount = data.reduce((acc, cur) => acc + cur.absent, 0);
-      setTotalPresent(totalPresentCount);
-      setTotalAbsent(totalAbsentCount);
-    }, 1500); // Simulate loading delay
+      // Calculate totals
+      const present = mockData.reduce((acc, cur) => acc + cur.present, 0);
+      const absent = mockData.reduce((acc, cur) => acc + cur.absent, 0);
+      setTotalPresent(present);
+      setTotalAbsent(absent);
+    }, 1500);
   }, []);
 
   const presentPercentage = (totalPresent / (totalPresent + totalAbsent)) * 100;
 
-  // Graph Data
+  // Chart configuration
   const chartData = {
-    labels: attendanceData.map((data) => data.date),
+    labels: attendanceData.map((d) => d.date),
     datasets: [
       {
         label: "Present Students",
-        data: attendanceData.map((data) => data.present),
-        fill: false,
-        borderColor: "green",
-        tension: 0.1,
+        data: attendanceData.map((d) => d.present),
+        borderColor: "#10B981",
+        tension: 0.4,
+        pointRadius: 4,
       },
       {
         label: "Absent Students",
-        data: attendanceData.map((data) => data.absent),
-        fill: false,
-        borderColor: "red",
-        tension: 0.1,
+        data: attendanceData.map((d) => d.absent),
+        borderColor: "#EF4444",
+        tension: 0.4,
+        pointRadius: 4,
       },
     ],
   };
 
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Attendance Trend',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Students',
+        },
+      },
+    },
+  };
+
   return (
-    <Card className="shadow-sm">
-      <Card.Body>
-        <Card.Title>Attendance Overview</Card.Title>
+    <Card className="shadow-sm h-100">
+      <Card.Body className="d-flex flex-column">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <Card.Title>Attendance Overview</Card.Title>
+          <button 
+            onClick={onViewDetails}
+            className="btn btn-link text-primary"
+          >
+            View Details →
+          </button>
+        </div>
 
         {loading ? (
-          <div className="d-flex justify-content-center">
+          <div className="d-flex justify-content-center flex-grow-1 align-items-center">
             <Spinner animation="border" variant="primary" />
           </div>
         ) : (
           <>
-            <Row className="mb-3">
-              <Col>
-                <h5>Total Present: {totalPresent}</h5>
-                <ProgressBar
-                  now={presentPercentage}
-                  label={`${presentPercentage.toFixed(1)}%`}
-                  variant="success"
-                />
+            <Row className="g-3 mb-4">
+              <Col md={6}>
+                <div className="p-3 bg-success bg-opacity-10 rounded">
+                  <h5 className="text-success">Present: {totalPresent}</h5>
+                  <ProgressBar
+                    now={presentPercentage}
+                    label={`${presentPercentage.toFixed(1)}%`}
+                    variant="success"
+                    className="rounded-pill"
+                  />
+                </div>
               </Col>
-              <Col>
-                <h5>Total Absent: {totalAbsent}</h5>
-                <ProgressBar
-                  now={100 - presentPercentage}
-                  label={`${(100 - presentPercentage).toFixed(1)}%`}
-                  variant="danger"
-                />
-              </Col>
-            </Row>
-
-            <Line data={chartData} />
-
-            <Row className="mt-4">
-              <Col>
-                <div className="text-center">
-                  <h6>Attendance Over Time</h6>
-                  <p>Track the attendance trends for the past days</p>
+              <Col md={6}>
+                <div className="p-3 bg-danger bg-opacity-10 rounded">
+                  <h5 className="text-danger">Absent: {totalAbsent}</h5>
+                  <ProgressBar
+                    now={100 - presentPercentage}
+                    label={`${(100 - presentPercentage).toFixed(1)}%`}
+                    variant="danger"
+                    className="rounded-pill"
+                  />
                 </div>
               </Col>
             </Row>
+
+            <div className="flex-grow-1">
+              <Line data={chartData} options={chartOptions} />
+            </div>
           </>
         )}
       </Card.Body>
     </Card>
   );
-};
-
-export default AttendanceWidget;
+}

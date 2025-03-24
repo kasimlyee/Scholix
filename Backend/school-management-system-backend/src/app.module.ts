@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { StudentModule } from './student/student.module';
-import { AttendanceModule } from './attendance/attendance.module';
 import { UserModule } from './user/user.module'; // Keep UserModule here
 import { TeachersModule } from './teachers/teachers.module';
 import { BioTimeMachineModule } from './bio-time-machine/bio-time-machine.module';
@@ -23,7 +22,6 @@ import { CommunicationModule } from './communication/communication.module';
     }),
     AuthModule,
     StudentModule,
-    AttendanceModule,
     UserModule,
     TeachersModule,
     BioTimeMachineModule,

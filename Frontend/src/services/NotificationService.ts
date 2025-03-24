@@ -1,5 +1,6 @@
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 import { User, Transaction } from "../types/libraryTypes";
+import axios from "axios";
 
 export const sendReminder = async (user: User, transaction: Transaction) => {
   const message = `Reminder: ${transaction.book.title} is due on ${format(
@@ -27,7 +28,15 @@ export const sendEmail = async (email: string, content: string) => {
 };
 
 export const sendSMS = async (phone: string, content: string) => {
-  //implementing SMS sending logic
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/comm/sms`,
+      { phone, content }
+    );
+    return response.status === 200 ? "sent" : "failed";
+  } catch {
+    return "failed";
+  }
 };
 
 export const sendPushNotification = (userId: number, content: string) => {
